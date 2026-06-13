@@ -1,0 +1,70 @@
+# Setup
+addi $1,$0,10
+addi $2,$0,20
+
+# Forwarding chain
+add  $3,$1,$2        # 30
+sub  $4,$3,$1        # 20
+add  $5,$4,$3        # 50
+
+# Logic ops
+and  $6,$3,$5        # 30 & 50 = 18
+or   $7,$3,$5        # 30 | 50 = 62
+xor  $8,$3,$5        # 44
+nor  $9,$3,$5        # ~(62)
+
+# Comparisons
+slt  $10,$1,$2       # 1
+sltu $11,$2,$1       # 0
+
+# Shifts
+addi $12,$0,1
+sll  $13,$12,4       # 16
+srl  $14,$13,2       # 4
+
+addi $15,$0,-16
+sra  $16,$15,2       # -4
+
+# Store / Load
+sw   $5,0($0)
+lw   $17,0($0)
+
+# Load-use hazard
+add  $18,$17,$17     # 100
+
+# BEQ taken
+beq  $18,$18,SKIP1
+addi $19,$0,999      # should NOT execute
+
+SKIP1:
+
+# BNE taken
+bne  $1,$2,SKIP2
+addi $20,$0,999      # should NOT execute
+
+SKIP2:
+
+# BLEZ taken
+addi $21,$0,-1
+blez $21,SKIP3
+addi $22,$0,999      # should NOT execute
+
+SKIP3:
+
+# BGTZ taken
+addi $23,$0,5
+bgtz $23,SKIP4
+addi $24,$0,999      # should NOT execute
+
+SKIP4:
+
+# Jump
+j TARGET
+addi $25,$0,999      # should NOT execute
+
+TARGET:
+addi $26,$0,123
+
+nop
+nop
+nop

@@ -1,0 +1,145 @@
+# r1 = 10
+addi  $1, $0, 10
+2001000A
+
+# r2 = 20
+addi  $2, $0, 20
+20020014
+
+# r3 = r1 + r2 = 30
+add   $3, $1, $2
+00221820
+
+# r4 = r2 - r1 = 10
+sub   $4, $2, $1
+00412022
+
+# r5 = r1 & r2
+and   $5, $1, $2
+00222824
+
+# r6 = r1 | r2
+or    $6, $1, $2
+00223025
+
+# r7 = r1 ^ r2
+xor   $7, $1, $2
+00223826
+
+# r8 = ~(r1 | r2)
+nor   $8, $1, $2
+00224027
+
+# r9 = (r1 < r2) = 1
+slt   $9, $1, $2
+0022482A
+
+# r10 = (r2 < r1) unsigned = 0
+sltu  $10, $2, $1
+0041502B
+
+# r11 = 1
+addi  $11, $0, 1
+200B0001
+
+# r12 = r11 << 3 = 8
+sll   $12, $11, 3
+000B60C0
+
+# r13 = r12 >> 2 = 2
+srl   $13, $12, 2
+000C6882
+
+# r14 = -8
+addi  $14, $0, -8
+200EFFF8
+
+# r15 = r14 >>> 2 = -2
+sra   $15, $14, 2
+000E7883
+
+# store r3 at mem[0]
+sw    $3, 0($0)
+AC030000
+
+# load mem[0] into r16
+lw    $16, 0($0)
+8C100000
+
+# if r3 == r16 jump to LABEL1
+beq   $3, $16, LABEL1
+10700001
+
+# should NOT execute
+addi  $17, $0, 999
+201103E7
+
+# LABEL1:
+# if r1 != r2 jump to LABEL2
+bne   $1, $2, LABEL2
+14220001
+
+# should NOT execute
+addi  $18, $0, 888
+20120378
+
+# LABEL2
+# r19 = -1
+addi  $19, $0, -1
+2013FFFF
+
+# branch because r19 <= 0
+blez  $19, NEG_LABEL
+1A600001
+
+# should NOT execute
+addi  $20, $0, 777
+20140309
+
+# NEG_LABEL:
+# r21 = 5
+addi  $21, $0, 5
+20150005
+
+# branch because r21 > 0
+bgtz  $21, POS_LABEL
+1EA00001
+
+# should NOT execute
+addi  $22, $0, 666
+2016029A
+
+# POS_LABEL:
+# counter = 5
+addi  $23, $0, 5
+20170005
+
+# sum = 0
+addi  $24, $0, 0
+20180000
+
+# LOOP:
+# sum += counter
+add   $24, $24, $23
+0317C020
+
+# counter--
+addi  $23, $23, -1
+22F7FFFF
+
+# loop if counter > 0
+bgtz  $23, LOOP
+1EE0FFFD
+
+# jump to DONE
+j DONE
+08000021
+
+# should NOT execute
+addi  $25, $0, 1234
+201904D2
+
+# DONE:
+# r26 = 55
+addi  $26, $0, 55
+201A0037
