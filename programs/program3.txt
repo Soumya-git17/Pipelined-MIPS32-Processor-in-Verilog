@@ -65,6 +65,7 @@ addi $25,$0,999      # should NOT execute
 TARGET:
 addi $26,$0,123
 
-nop
-nop
+END:
+j END
+
 nop
