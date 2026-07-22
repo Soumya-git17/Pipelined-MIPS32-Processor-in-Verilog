@@ -5,6 +5,8 @@ module cpu_tb;
 
 reg clk;
 reg rst;
+integer i;
+real CPI;
 
 cpu dut(clk, rst);
 
@@ -18,39 +20,34 @@ initial begin
     rst = 1;
     #10;
     rst = 0;
+end
 
-    #700;
+always @(posedge clk) begin
+    if (dut.pc_out == 32'd132) begin
+        repeat(4) @(posedge clk);
+        $display(" Program Finished");
+        $display("\nFinal Register Values");
+        for(i=0;i<32;i=i+1)
+            $display("R%-2d = %0d", i, dut.rf1.regfile[i]);
 
-    $display("\n Final Register Values ");
+        if(dut.instr_count != 0) CPI = dut.cycle_count * 1.0 / dut.instr_count;
+        else CPI = 0.0;
 
-    $display("R1  = %0d", dut.rf1.regfile[1]);
-    $display("R2  = %0d", dut.rf1.regfile[2]);
-    $display("R3  = %0d", dut.rf1.regfile[3]);
-    $display("R4  = %0d", dut.rf1.regfile[4]);
-    $display("R5  = %0d", dut.rf1.regfile[5]);
-    $display("R6  = %0d", dut.rf1.regfile[6]);
-    $display("R7  = %0d", dut.rf1.regfile[7]);
-    $display("R8  = %0d", dut.rf1.regfile[8]);
-    $display("R9  = %0d", dut.rf1.regfile[9]);
-    $display("R10 = %0d", dut.rf1.regfile[10]);
-    $display("R11 = %0d", dut.rf1.regfile[11]);
-    $display("R12 = %0d", dut.rf1.regfile[12]);
-    $display("R13 = %0d", dut.rf1.regfile[13]);
-    $display("R14 = %0d", dut.rf1.regfile[14]);
-    $display("R15 = %0d", dut.rf1.regfile[15]);
-    $display("R16 = %0d", dut.rf1.regfile[16]);
-    $display("R17 = %0d", dut.rf1.regfile[17]);
-    $display("R18 = %0d", dut.rf1.regfile[18]);
-    $display("R19 = %0d", dut.rf1.regfile[19]);
-    $display("R20 = %0d", dut.rf1.regfile[20]);
-    $display("R21 = %0d", dut.rf1.regfile[21]);
-    $display("R22 = %0d", dut.rf1.regfile[22]);
-    $display("R23 = %0d", dut.rf1.regfile[23]);
-    $display("R24 = %0d", dut.rf1.regfile[24]);
-    $display("R25 = %0d", dut.rf1.regfile[25]);
-    $display("R26 = %0d", dut.rf1.regfile[26]);
-
-    $finish;
+        $display("\nPerformance:");
+        $display("-------");
+        $display("Total Cycles      = %0d", dut.cycle_count);
+        $display("Instructions      = %0d", dut.instr_count);
+        $display("CPI               = %0f", CPI);
+        $display("-------");
+        $display("Pipeline Stalls   = %0d", dut.stall_count);
+        $display("-------");
+        $display("ForwardA events   = %0d", dut.forwardA_count);
+        $display("ForwardB events   = %0d", dut.forwardB_count);
+        $display("Total Forwarding  = %0d", dut.forwardA_count + dut.forwardB_count);        
+        $display("-------");
+        $display("Branch count      = %0d", dut.branch_count);
+        $finish;
+    end
 end
 
 endmodule
