@@ -150,4 +150,57 @@ assign pc_next = jr ? jr_src :
 assign flush_IFID = branch_taken | jump | jr;
 assign flush_IDEX = branch_taken;
 
+// cpi
+reg [31:0] cycle_count;
+reg [31:0] instr_count;
+always @(posedge clk or posedge rst) begin
+    if(rst) begin
+        cycle_count <= 0;
+        instr_count <= 0;
+    end
+    else begin
+        cycle_count <= cycle_count + 1;
+        if(reg_write_WB || mem_write_MEM || branch_EX || jump || jr)
+            instr_count <= instr_count + 1;
+    end
+end
+
+// stall counter
+reg [31:0] stall_count;
+
+always @(posedge clk or posedge rst) begin
+    if(rst) stall_count <= 0;
+    else if(stall) stall_count <= stall_count + 1;
+end
+
+// branch count
+reg [31:0] branch_count;
+reg [31:0] branch_taken_count;
+
+always @(posedge clk or posedge rst) begin
+    if(rst) begin
+        branch_count <= 0;
+        branch_taken_count <= 0;
+    end
+    else begin
+        if(branch_EX) branch_count <= branch_count + 1;
+        if(branch_taken) branch_taken_count <= branch_taken_count + 1;
+    end
+end
+
+// forward count
+reg [31:0] forwardA_count;
+reg [31:0] forwardB_count;
+
+always @(posedge clk or posedge rst) begin
+    if(rst) begin
+        forwardA_count <= 0;
+        forwardB_count <= 0;
+    end
+    else begin
+        if(forward_a != 2'b00) forwardA_count <= forwardA_count + 1;
+        if(forward_b != 2'b00) forwardB_count <= forwardB_count + 1;
+    end
+end
+
 endmodule
